@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 
 import 'package:easybreezy_app/auth/modals/modals.dart';
 import 'package:easybreezy_app/auth/repositories/auth_repositories.dart';
+import 'package:easybreezy_app/constants.dart';
 
 part 'auth_event.dart';
 
@@ -22,37 +23,38 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     AuthEvent event,
   ) async* {
     if (event is AuthSignedIn) {
-      final String token = await authRepositories.signIn(event.body);
-      if (token != null) {
+      try {
+        final response = await authRepositories.signIn(event.body);
+
         SharedPreferences prefs = await SharedPreferences.getInstance();
-        await prefs.setString("USER_TOKEN", token);
+        await prefs.setString(userToken, response.data["data"]);
         yield AuthSignInSuccess();
-      } else {
-        yield AuthSignInFailure();
+      } catch (e) {
+        if (e.response.statusCode == 401) {
+          yield AuthSignInFailure(error: "bad_credentials");
+        } else {
+          yield AuthSignInFailure(error: "unexpected_server_error");
+        }
       }
     }
 
     if (event is AuthSignedOut) {
-      final isSignOut = await authRepositories.signOut();
+      try {
+        await authRepositories.signOut();
 
-      if (isSignOut) {
-        SharedPreferences prefs = await SharedPreferences.getInstance();
-        await prefs.remove("USER_TOKEN");
         yield AuthSignOutSuccess();
+      } catch (e) {
+        yield AuthSignOutFailure(error: "unexpected_server_error");
       }
     }
 
     if (event is AuthChecked) {
-      final response = await authRepositories.check();
+      try {
+        final response = await authRepositories.check();
 
-      if (response != null) {
-        final User user = User.fromJson(response);
-
-        if (user != null) {
-          yield AuthCheckSuccess(user: user);
-        }
-      } else {
-        yield AuthCheckFailure();
+        yield AuthCheckSuccess(user: User.fromJson(response.data["data"]));
+      } catch (e) {
+        yield AuthCheckFailure(error: "unexpected_server_error");
       }
     }
   }

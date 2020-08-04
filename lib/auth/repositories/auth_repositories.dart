@@ -6,26 +6,14 @@ class AuthRepositories {
     return dio.post("/api/login", data: {
       "email": body.email,
       "password": body.password,
-    }).then((value) {
-      return value.data["data"];
-    }).catchError((error) {
-      return null;
     });
   }
 
   signOut() {
-    return dio.get("/api/logout").then((value) {
-      return true;
-    }).catchError((error) {
-      return null;
-    });
+    return dio.get("/api/logout");
   }
 
   check() {
-    return dio.get("/api/users/me").then((value) {
-      return value.data["data"];
-    }).catchError((error) {
-      return null;
-    });
+    return dio.get("/api/users/me");
   }
 }
