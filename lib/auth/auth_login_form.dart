@@ -60,7 +60,7 @@ class _AuthLoginFormState extends State<AuthLoginForm> {
                     ),
                     Container(
                       child: state is AuthSignInFailure
-                          ? Error(
+                          ? ErrorMessage(
                               text: state.error,
                             )
                           : null,

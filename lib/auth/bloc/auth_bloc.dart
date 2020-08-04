@@ -42,9 +42,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       try {
         await authRepositories.signOut();
 
-        yield AuthSignInSuccess();
+        yield AuthSignOutSuccess();
       } catch (e) {
-        AuthSignOutFailure(error: "unexpected_server_error");
+        yield AuthSignOutFailure(error: "unexpected_server_error");
       }
     }
 
@@ -52,9 +52,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       try {
         final response = await authRepositories.check();
 
-        yield AuthCheckSuccess(user: User.fromJson(response.data));
+        yield AuthCheckSuccess(user: User.fromJson(response.data["data"]));
       } catch (e) {
-        AuthCheckFailure(error: "unexpected_server_error");
+        yield AuthCheckFailure(error: "unexpected_server_error");
       }
     }
   }

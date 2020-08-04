@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-class Error extends StatelessWidget {
+class ErrorMessage extends StatelessWidget {
   final String text;
 
-  Error({@required this.text});
+  ErrorMessage({@required this.text});
 
   @override
   Widget build(BuildContext context) {
