@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 
 import 'package:easybreezy_app/auth/modals/modals.dart';
 import 'package:easybreezy_app/auth/repositories/auth_repositories.dart';
+import 'package:easybreezy_app/modals/modals.dart';
 
 part 'auth_event.dart';
 
@@ -22,36 +23,35 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     AuthEvent event,
   ) async* {
     if (event is AuthSignedIn) {
-      final String token = await authRepositories.signIn(event.body);
-      if (token != null) {
+      final response = await authRepositories.signIn(event.body);
+
+      if (response is Success) {
         SharedPreferences prefs = await SharedPreferences.getInstance();
-        await prefs.setString("USER_TOKEN", token);
+        await prefs.setString("USER_TOKEN", response.data);
         yield AuthSignInSuccess();
-      } else {
-        yield AuthSignInFailure();
+      } else if (response is Failure) {
+        yield AuthSignInFailure(error: response.error);
       }
     }
 
     if (event is AuthSignedOut) {
-      final isSignOut = await authRepositories.signOut();
+      final response = await authRepositories.signOut();
 
-      if (isSignOut) {
+      if (response is Success) {
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.remove("USER_TOKEN");
         yield AuthSignOutSuccess();
+      } else if (response is Failure) {
+        yield AuthSignOutFailure();
       }
     }
 
     if (event is AuthChecked) {
       final response = await authRepositories.check();
 
-      if (response != null) {
-        final User user = User.fromJson(response);
-
-        if (user != null) {
-          yield AuthCheckSuccess(user: user);
-        }
-      } else {
+      if (response is Success) {
+        yield AuthCheckSuccess(user: User.fromJson(response.data));
+      } else if (response is Failure) {
         yield AuthCheckFailure();
       }
     }

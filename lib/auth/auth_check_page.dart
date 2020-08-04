@@ -8,6 +8,10 @@ class AuthCheckPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) {
+        if (state is AuthSignInSuccess) {
+          context.bloc<AuthBloc>().add(AuthChecked());
+        }
+
         if (state is AuthCheckSuccess) {
           Navigator.pushNamed(context, "/profile", arguments: state.user.id);
         }

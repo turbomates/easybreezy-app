@@ -11,7 +11,14 @@ class AuthInitial extends AuthState {}
 
 class AuthSignInSuccess extends AuthState {}
 
-class AuthSignInFailure extends AuthState {}
+class AuthSignInFailure extends AuthState {
+  final String error;
+
+  AuthSignInFailure({@required this.error});
+
+  @override
+  List<Object> get props => [error];
+}
 
 class AuthSignOutSuccess extends AuthState {}
 

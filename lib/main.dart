@@ -2,12 +2,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
 
 import 'package:easybreezy_app/auth/auth_check_page.dart';
-import 'package:easybreezy_app/auth/auth_form.dart';
 import 'package:easybreezy_app/auth/bloc/auth_bloc.dart';
 import 'package:easybreezy_app/auth/repositories/auth_repositories.dart';
 import 'package:easybreezy_app/profile/bloc/profile_bloc.dart';
 import 'package:easybreezy_app/profile/profile_page.dart';
 import 'package:easybreezy_app/profile/repositories/repository.dart';
+import 'package:easybreezy_app/auth/auth_login_page.dart';
 
 void main() {
   runApp(App());
@@ -54,8 +54,7 @@ class Route extends StatelessWidget {
       initialRoute: "/",
       routes: {
         "/": (context) => AuthCheckPage(),
-        "/login": (context) => AuthForm(),
-//        "/profile": (context) => ProfilePage(),
+        "/login": (context) => AuthLoginPage(),
       },
     );
   }
