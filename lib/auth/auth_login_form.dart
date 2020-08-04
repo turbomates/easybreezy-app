@@ -5,6 +5,7 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 
 import 'package:easybreezy_app/auth/bloc/auth_bloc.dart';
 import 'package:easybreezy_app/auth/modals/modals.dart';
+import 'package:easybreezy_app/widget/widgets.dart';
 
 class AuthLoginForm extends StatefulWidget {
   @override
@@ -42,8 +43,8 @@ class _AuthLoginFormState extends State<AuthLoginForm> {
                         errorText: isAuthSignInFailure ? "" : null,
                       ),
                       validators: [
-//                        FormBuilderValidators.required(errorText: "Required"),
-//                        FormBuilderValidators.email(errorText: "Invalid")
+                        FormBuilderValidators.required(errorText: "Required"),
+                        FormBuilderValidators.email(errorText: "Invalid"),
                       ],
                     ),
                     FormBuilderTextField(
@@ -58,9 +59,10 @@ class _AuthLoginFormState extends State<AuthLoginForm> {
                       ],
                     ),
                     Container(
-                      margin: EdgeInsets.only(top: 30),
                       child: state is AuthSignInFailure
-                          ? _getErrorWidget(state.error)
+                          ? Error(
+                              text: state.error,
+                            )
                           : null,
                     ),
                     Padding(
@@ -77,20 +79,14 @@ class _AuthLoginFormState extends State<AuthLoginForm> {
     );
   }
 
-  Widget _getErrorWidget(String text) {
-    return Text(
-      text,
-      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.redAccent),
-    );
-  }
-
   void _validateInputs() {
     if (_fbKey.currentState.validate()) {
       _fbKey.currentState.save();
       BlocProvider.of<AuthBloc>(context).add(AuthSignedIn(
           body: AuthModal(
-              email: _fbKey.currentState.value["email"],
-              password: _fbKey.currentState.value["password"])));
+        email: _fbKey.currentState.value["email"],
+        password: _fbKey.currentState.value["password"],
+      )));
     } else {
       setState(() {
         _autoValidate = true;

@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 
 import 'package:easybreezy_app/auth/modals/modals.dart';
 import 'package:easybreezy_app/auth/repositories/auth_repositories.dart';
-import 'package:easybreezy_app/modals/modals.dart';
+import 'package:easybreezy_app/constants.dart';
 
 part 'auth_event.dart';
 
@@ -23,36 +23,38 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     AuthEvent event,
   ) async* {
     if (event is AuthSignedIn) {
-      final response = await authRepositories.signIn(event.body);
+      try {
+        final response = await authRepositories.signIn(event.body);
 
-      if (response is Success) {
         SharedPreferences prefs = await SharedPreferences.getInstance();
-        await prefs.setString("USER_TOKEN", response.data);
+        await prefs.setString(userToken, response.data["data"]);
         yield AuthSignInSuccess();
-      } else if (response is Failure) {
-        yield AuthSignInFailure(error: response.error);
+      } catch (e) {
+        if (e.response.statusCode == 401) {
+          yield AuthSignInFailure(error: "bad_credentials");
+        } else {
+          yield AuthSignInFailure(error: "unexpected_server_error");
+        }
       }
     }
 
     if (event is AuthSignedOut) {
-      final response = await authRepositories.signOut();
+      try {
+        await authRepositories.signOut();
 
-      if (response is Success) {
-        SharedPreferences prefs = await SharedPreferences.getInstance();
-        await prefs.remove("USER_TOKEN");
-        yield AuthSignOutSuccess();
-      } else if (response is Failure) {
-        yield AuthSignOutFailure();
+        yield AuthSignInSuccess();
+      } catch (e) {
+        AuthSignOutFailure(error: "unexpected_server_error");
       }
     }
 
     if (event is AuthChecked) {
-      final response = await authRepositories.check();
+      try {
+        final response = await authRepositories.check();
 
-      if (response is Success) {
         yield AuthCheckSuccess(user: User.fromJson(response.data));
-      } else if (response is Failure) {
-        yield AuthCheckFailure();
+      } catch (e) {
+        AuthCheckFailure(error: "unexpected_server_error");
       }
     }
   }

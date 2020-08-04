@@ -22,7 +22,14 @@ class AuthSignInFailure extends AuthState {
 
 class AuthSignOutSuccess extends AuthState {}
 
-class AuthSignOutFailure extends AuthState {}
+class AuthSignOutFailure extends AuthState {
+  final String error;
+
+  AuthSignOutFailure({@required this.error});
+
+  @override
+  List<Object> get props => [error];
+}
 
 class AuthCheckSuccess extends AuthState {
   final User user;
@@ -33,4 +40,11 @@ class AuthCheckSuccess extends AuthState {
   List<Object> get props => [user];
 }
 
-class AuthCheckFailure extends AuthState {}
+class AuthCheckFailure extends AuthState {
+  final String error;
+
+  AuthCheckFailure({@required this.error});
+
+  @override
+  List<Object> get props => [error];
+}
